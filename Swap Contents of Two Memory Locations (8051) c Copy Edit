@@ -1,0 +1,17 @@
+#include <reg51.h>
+
+void main() {
+    unsigned char *ptr1 = (unsigned char *)0x30;  // Memory location 1
+    unsigned char *ptr2 = (unsigned char *)0x31;  // Memory location 2
+    unsigned char temp;
+
+    *ptr1 = 0x12;  // Example values
+    *ptr2 = 0x34;
+
+    // Swapping values
+    temp = *ptr1;
+    *ptr1 = *ptr2;
+    *ptr2 = temp;
+
+    while (1);
+}
