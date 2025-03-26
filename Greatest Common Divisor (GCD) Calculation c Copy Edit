@@ -1,0 +1,19 @@
+#include <reg51.h>
+
+unsigned int gcd(unsigned int a, unsigned int b) {
+    while (b != 0) {
+        unsigned int temp = b;
+        b = a % b;
+        a = temp;
+    }
+    return a;
+}
+
+void main() {
+    unsigned int num1 = 56, num2 = 98;
+    unsigned int result = gcd(num1, num2);
+
+    P0 = result;  // Display result on P0
+    while(1);
+}
+
