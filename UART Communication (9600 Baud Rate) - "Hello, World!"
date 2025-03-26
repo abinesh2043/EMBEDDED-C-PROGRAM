@@ -1,0 +1,29 @@
+#include <reg51.h>
+
+#define BAUD_RATE 0xFD  // 9600 baud for 11.0592MHz crystal
+
+void uart_init() {
+    TMOD = 0x20;  // Timer 1, mode 2 (auto-reload)
+    TH1 = BAUD_RATE;
+    SCON = 0x50;  // 8-bit UART mode
+    TR1 = 1;      // Start Timer 1
+}
+
+void uart_tx(char c) {
+    SBUF = c;
+    while (!TI);  // Wait for transmission to complete
+    TI = 0;       // Clear flag
+}
+
+void uart_tx_string(char *s) {
+    while (*s) {
+        uart_tx(*s);
+        s++;
+    }
+}
+
+void main() {
+    uart_init();  // Initialize UART
+    uart_tx_string("Hello, World!");
+    while (1);
+}
