@@ -1,0 +1,27 @@
+#include <reg51.h>
+
+void removeDuplicates(unsigned char arr[], unsigned char *size) {
+    unsigned char i, j, k;
+
+    for (i = 0; i < *size; i++) {
+        for (j = i + 1; j < *size;) {
+            if (arr[i] == arr[j]) {
+                for (k = j; k < *size - 1; k++) {
+                    arr[k] = arr[k + 1];  // Shift elements left
+                }
+                (*size)--;  // Reduce size
+            } else {
+                j++;
+            }
+        }
+    }
+}
+
+void main() {
+    unsigned char arr[6] = {1, 2, 2, 3, 4, 4};  // Example array
+    unsigned char size = 6;
+    
+    removeDuplicates(arr, &size);
+    
+    while (1);
+}
