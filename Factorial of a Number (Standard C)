@@ -1,0 +1,62 @@
+#include <reg51.h>
+#include <stdio.h>
+
+#define BAUD_RATE 0xFD  // 9600 baud for 11.0592MHz crystal
+
+// UART Initialization
+void uart_init() {
+    TMOD = 0x20;  // Timer 1, mode 2 (auto-reload)
+    TH1 = BAUD_RATE;
+    SCON = 0x50;  // 8-bit UART mode
+    TR1 = 1;      // Start Timer 1
+}
+
+// Transmit a character via UART
+void uart_tx(char c) {
+    SBUF = c;
+    while (!TI);  // Wait for transmission to complete
+    TI = 0;       // Clear transmit interrupt flag
+}
+
+// Transmit a string via UART
+void uart_tx_string(char *s) {
+    while (*s) {
+        uart_tx(*s);
+        s++;
+    }
+}
+
+// Transmit an integer via UART
+void uart_tx_int(unsigned long num) {
+    char buffer[20];
+    sprintf(buffer, "%lu", num);  // Convert integer to string
+    uart_tx_string(buffer);
+}
+
+// Function to calculate factorial using iteration
+unsigned long factorial(unsigned char n) {
+    unsigned long fact = 1;
+    unsigned char i;
+    for (i = 1; i <= n; i++) {
+        fact *= i;
+    }
+    return fact;
+}
+
+void main() {
+    unsigned char num = 5;  // Example number
+    unsigned long fact;
+
+    uart_init();  // Initialize UART
+
+    uart_tx_string("Factorial of ");
+    uart_tx_int(num);
+    uart_tx_string(" is ");
+
+    fact = factorial(num);  // Calculate factorial
+
+    uart_tx_int(fact);
+    uart_tx_string("\n");
+
+    while (1);
+}
