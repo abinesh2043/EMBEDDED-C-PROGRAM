@@ -1,0 +1,51 @@
+#include <reg51.h>
+#include <stdio.h>
+
+#define BAUD_RATE 0xFD  // 9600 baud for 11.0592MHz crystal
+
+void uart_init() {
+    TMOD = 0x20;  
+    TH1 = BAUD_RATE;
+    SCON = 0x50;
+    TR1 = 1;
+}
+
+void uart_tx(char c) {
+    SBUF = c;
+    while (!TI);
+    TI = 0;
+}
+
+void uart_tx_string(char *s) {
+    while (*s) {
+        uart_tx(*s);
+        s++;
+    }
+}
+
+void uart_tx_int(int num) {
+    char buffer[10];
+    sprintf(buffer, "%d", num);
+    uart_tx_string(buffer);
+}
+
+void main() {
+    unsigned int num = 153;  // Example 3-digit number
+    unsigned int temp, remainder, sum = 0;
+
+    uart_init();
+    temp = num;
+
+    while (temp > 0) {
+        remainder = temp % 10;
+        sum += remainder * remainder * remainder;
+        temp /= 10;
+    }
+
+    if (sum == num)
+        uart_tx_string("Armstrong Number\n");
+    else
+        uart_tx_string("Not an Armstrong Number\n");
+
+    while (1);
+}
