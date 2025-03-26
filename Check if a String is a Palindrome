@@ -1,0 +1,47 @@
+#include <reg51.h>
+#include <string.h>
+
+#define BAUD_RATE 0xFD  // 9600 baud rate for 11.0592MHz crystal
+
+void uart_init() {
+    TMOD = 0x20;  // Timer 1 mode 2 (auto-reload)
+    TH1 = BAUD_RATE;
+    SCON = 0x50;  // 8-bit UART mode
+    TR1 = 1;      // Start Timer 1
+}
+
+void uart_tx(char c) {
+    SBUF = c;
+    while (!TI);  // Wait for transmission to complete
+    TI = 0;       // Clear the flag
+}
+
+void uart_tx_string(char *s) {
+    while (*s) {
+        uart_tx(*s);
+        s++;
+    }
+}
+
+void main() {
+    char str[] = "madam";  // Input string
+    int i, len;
+    int flag = 1;
+
+    uart_init();  // Initialize UART
+
+    len = strlen(str);
+    for (i = 0; i < len / 2; i++) {
+        if (str[i] != str[len - i - 1]) {
+            flag = 0;
+            break;
+        }
+    }
+
+    if (flag)
+        uart_tx_string("Palindrome\n");
+    else
+        uart_tx_string("Not a Palindrome\n");
+
+    while (1);
+}
