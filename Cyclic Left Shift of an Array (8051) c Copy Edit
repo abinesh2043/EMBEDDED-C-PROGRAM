@@ -1,0 +1,19 @@
+#include <reg51.h>
+
+void main() {
+    unsigned char arr[5] = {1, 2, 3, 4, 5};  // Example array
+    unsigned char temp, i;
+
+    // Store first element
+    temp = arr[0];
+
+    // Shift elements left
+    for (i = 0; i < 4; i++) {
+        arr[i] = arr[i + 1];
+    }
+
+    // Place first element at last position
+    arr[4] = temp;
+
+    while (1);
+}
