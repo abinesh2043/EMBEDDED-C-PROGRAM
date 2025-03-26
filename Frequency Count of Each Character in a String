@@ -1,0 +1,57 @@
+#include <reg51.h>
+#include <string.h>
+
+#define BAUD_RATE 0xFD  // 9600 baud for 11.0592MHz crystal
+
+void uart_init() {
+    TMOD = 0x20;  // Timer 1, mode 2 (auto-reload)
+    TH1 = BAUD_RATE;
+    SCON = 0x50;  // 8-bit UART mode
+    TR1 = 1;      // Start Timer 1
+}
+
+void uart_tx(char c) {
+    SBUF = c;
+    while (!TI);  // Wait for transmission to complete
+    TI = 0;       // Clear transmit interrupt flag
+}
+
+void uart_tx_string(char *s) {
+    while (*s) {
+        uart_tx(*s);
+        s++;
+    }
+}
+
+void uart_tx_int(int num) {
+    char buffer[10];
+    sprintf(buffer, "%d", num);  // Convert integer to string
+    uart_tx_string(buffer);
+}
+
+void main() {
+    char str[] = "hello world";
+    int freq[256] = {0};  // ASCII character count
+    int i;
+
+    uart_init();  // Initialize UART
+
+    // Count frequency
+    for (i = 0; str[i] != '\0'; i++) {
+        freq[(unsigned char)str[i]]++;
+    }
+
+    // Print frequency via UART
+    uart_tx_string("Character frequencies:\n");
+
+    for (i = 0; i < 256; i++) {
+        if (freq[i] > 0) {
+            uart_tx(i);  // Transmit character
+            uart_tx_string(" : ");
+            uart_tx_int(freq[i]);  // Transmit frequency
+            uart_tx('\n');  // New line for formatting
+        }
+    }
+
+    while (1);
+}
